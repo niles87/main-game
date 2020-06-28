@@ -18,7 +18,7 @@ class Platform implements PlatformInterface {
     this.height = height;
   }
   draw() {
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "transparent";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }
