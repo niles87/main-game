@@ -1,5 +1,5 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const canvas: any = document.getElementById("canvas");
+const ctx: any = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -8,12 +8,7 @@ let pressedEnter: boolean = false;
 let keys: any = [];
 let fps: number, fpsInterval: number, startTime: number, now: number, then: number, elapsed: number;
 
-const floor = new Platform({ x: 0, y: canvas.height - 20, width: canvas.width, height: 20 });
-floor.width = canvas.width;
-
-const player = new Sprite();
-player.x = 150;
-player.y = canvas.height - (player.height * 2 + floor.height);
+const sprite = new Sprite();
 
 const background = new Image();
 background.src = "./media/bg.png";
@@ -27,6 +22,7 @@ const BG = {
 
 function handleBackground(): void {
   ctx.drawImage(background, BG.x1 - 2, BG.y, BG.width, BG.height);
+  ctx.drawImage(background, BG.x2, BG.y, BG.width, BG.height);
 }
 
 function startAnimating(fps: number): void {
@@ -43,8 +39,8 @@ function animate(): void {
     then = now - (elapsed % fpsInterval);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     handleBackground();
-    showPlatform(floor);
-    player.draw();
+    //   showPlatform(floor);
+    sprite.draw();
     if (pressedEnter === false) {
       // do not allow character to move until enter is pressed
       ctx.font = "40px Georgia";
@@ -55,24 +51,24 @@ function animate(): void {
       ctx.fill();
       ctx.stroke();
     } else {
-      player.update();
+      sprite.update();
     }
   }
 
   requestAnimationFrame(animate);
 }
 
-window.addEventListener("keydown", function (ev: any): void {
-  if (ev.code === "Enter") pressedEnter = true;
-  else if (ev.code !== "Enter") {
-    keys[ev.code] = true;
-  }
+window.addEventListener("keydown", function (e: any): void {
+  if (e.code === "Enter") pressedEnter = true;
+  else if (e.code !== "Enter") keys[e.code] = true;
 });
 
-window.addEventListener("keyup", function (ev: any): void {
-  delete keys[ev.code];
-
-  player.moving = false;
+window.addEventListener("keyup", function (e: any): void {
+  delete keys[e.code];
+  if (!sprite.jumping) {
+    sprite.moving = false;
+  }
+  sprite.moving = false;
 });
 
 startAnimating(20);

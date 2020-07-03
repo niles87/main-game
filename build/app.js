@@ -6,11 +6,7 @@ canvas.height = window.innerHeight;
 let pressedEnter = false;
 let keys = [];
 let fps, fpsInterval, startTime, now, then, elapsed;
-const floor = new Platform({ x: 0, y: canvas.height - 20, width: canvas.width, height: 20 });
-floor.width = canvas.width;
-const player = new Sprite();
-player.x = 150;
-player.y = canvas.height - (player.height * 2 + floor.height);
+const sprite = new Sprite();
 const background = new Image();
 background.src = "./media/bg.png";
 const BG = {
@@ -22,6 +18,7 @@ const BG = {
 };
 function handleBackground() {
     ctx.drawImage(background, BG.x1 - 2, BG.y, BG.width, BG.height);
+    ctx.drawImage(background, BG.x2, BG.y, BG.width, BG.height);
 }
 function startAnimating(fps) {
     fpsInterval = 1000 / fps;
@@ -36,8 +33,7 @@ function animate() {
         then = now - (elapsed % fpsInterval);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         handleBackground();
-        showPlatform(floor);
-        player.draw();
+        sprite.draw();
         if (pressedEnter === false) {
             ctx.font = "40px Georgia";
             ctx.fillStyle = "#fff";
@@ -48,20 +44,22 @@ function animate() {
             ctx.stroke();
         }
         else {
-            player.update();
+            sprite.update();
         }
     }
     requestAnimationFrame(animate);
 }
-window.addEventListener("keydown", function (ev) {
-    if (ev.code === "Enter")
+window.addEventListener("keydown", function (e) {
+    if (e.code === "Enter")
         pressedEnter = true;
-    else if (ev.code !== "Enter") {
-        keys[ev.code] = true;
-    }
+    else if (e.code !== "Enter")
+        keys[e.code] = true;
 });
-window.addEventListener("keyup", function (ev) {
-    delete keys[ev.code];
-    player.moving = false;
+window.addEventListener("keyup", function (e) {
+    delete keys[e.code];
+    if (!sprite.jumping) {
+        sprite.moving = false;
+    }
+    sprite.moving = false;
 });
 startAnimating(20);

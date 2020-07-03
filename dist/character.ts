@@ -1,52 +1,51 @@
-const playerSprite = new Image();
-playerSprite.src = "./media/bahamut.png";
-let jumpInterval: number;
-
-interface SpriteInterface {
+interface CharacterInterface {
   x: number;
   y: number;
-  velocity: number;
+  vel_y: number;
+  vel_x: number;
   width: number;
   height: number;
   frameX: number;
   frameY: number;
-  speed: number;
-  weight: number;
   moving: boolean;
+  jumping: boolean;
   draw(): void;
   update(): void;
-  movePlayer(): void;
-  handlePlayerFrame(): void;
+  move(): void;
+  handleFrame(): void;
   jump(): void;
 }
 
-class Sprite implements SpriteInterface {
+const playerSprite = new Image();
+playerSprite.src = "./media/bahamut.png";
+
+class Sprite implements CharacterInterface {
   x: number;
   y: number;
-  velocity: number;
+  vel_x: number;
+  vel_y: number;
   width: number;
   height: number;
   frameX: number;
   frameY: number;
-  speed: number;
-  weight: number;
   moving: boolean;
+  jumping: boolean;
   constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.velocity = 0;
+    this.x = 100;
+    this.y = canvas.height;
+    this.vel_x = 0;
+    this.vel_y = 0;
     this.width = 96;
     this.height = 96;
     this.frameX = 0;
     this.frameY = 2;
-    this.speed = 10;
-    this.weight = 2;
     this.moving = false;
+    this.jumping = false;
   }
   draw() {
     // draw image
-    // ctx.fillStyle = "black";
-    // ctx.fillRect(this.x, this.y, this.width * 2, this.height * 2);
+    // ctx.fillStyle = "grey";
+    // ctx.fillRect(this.x, this.y - this.height, this.width * 1.5, this.height * 1.5);
     ctx.drawImage(
       playerSprite,
       this.width * this.frameX,
@@ -54,60 +53,50 @@ class Sprite implements SpriteInterface {
       this.width,
       this.height,
       this.x,
-      this.y,
-      this.width * 2,
-      this.height * 2
+      this.y - this.height,
+      this.width * 1.5,
+      this.height * 1.5
     );
   }
   update() {
-    // sprite action
-    this.movePlayer();
-    this.handlePlayerFrame();
+    this.move();
+    this.handleFrame();
   }
-  movePlayer() {
-    if (keys["ArrowRight"] && this.x < canvas.width - this.width * 2) {
-      this.x += this.speed;
+  move() {
+    if (keys["ArrowRight"]) {
+      this.vel_x += 3;
       this.frameY = 2;
       this.moving = true;
     }
-    if (keys["ArrowLeft"] && this.x > 0) {
-      this.x -= this.speed;
+    if (keys["ArrowLeft"]) {
+      this.vel_x -= 3;
       this.frameY = 1;
       this.moving = true;
     }
-    if (keys["Space"]) {
-      this.jump();
+    if (keys["Space"] && !this.jumping) {
+      this.vel_y -= 140;
+      this.jumping = true;
+      this.moving = true;
+    }
+
+    this.vel_y += 10; // gravity
+    this.x += this.vel_x;
+    this.y += this.vel_y;
+    this.vel_x *= 0.8; // friction
+    this.vel_y *= 0.8; // friction
+
+    if (this.y > canvas.height - 50) {
+      this.jumping = false;
+      this.y = canvas.height - 50;
+      this.vel_y = 0;
     }
   }
-  handlePlayerFrame() {
+  handleFrame() {
     if (this.frameX < 3 && this.moving) {
       this.frameX++;
     } else {
       this.frameX = 0;
     }
   }
-  jump() {
-    let milSecs = 0;
-    console.log(this.y + this.height * 2);
-    if (this.y + this.height * 2 > floor.y) {
-      this.velocity = 0;
-    } else {
-      if (this.y < canvas.height / 3) {
-        do {
-          this.moving = true;
-          this.velocity += this.weight;
-          this.velocity *= 0.9;
-          this.y += this.velocity;
-        } while (this.y + this.height * 2 > floor.y);
-      } else {
-        do {
-          milSecs++;
-          this.moving = true;
-          this.velocity -= this.weight;
-          this.velocity *= 0.9;
-          this.y += this.velocity;
-        } while (milSecs < 5);
-      }
-    }
-  }
+  jump() {}
 }
