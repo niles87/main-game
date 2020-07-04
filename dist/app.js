@@ -5,20 +5,29 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let pressedEnter = false;
 let keys = [];
+let gameSpeed = 10;
 let fps, fpsInterval, startTime, now, then, elapsed;
 const sprite = new Sprite();
 const background = new Image();
 background.src = "./media/bg.png";
-const BG = {
+const backDrop = {
     x1: 0,
     x2: canvas.width,
     y: 0,
-    width: canvas.width + 2,
+    width: canvas.width + 5,
     height: canvas.height,
 };
 function handleBackground() {
-    ctx.drawImage(background, BG.x1 - 2, BG.y, BG.width, BG.height);
-    ctx.drawImage(background, BG.x2, BG.y, BG.width, BG.height);
+    if (keys["ArrowRight"] && sprite.x > 350) {
+        if (backDrop.x1 <= -backDrop.width + gameSpeed + 2)
+            backDrop.x1 = backDrop.width;
+        else
+            backDrop.x1 -= gameSpeed - 2;
+        if (backDrop.x2 <= -backDrop.width + gameSpeed + 2)
+            backDrop.x2 = backDrop.width;
+        else
+            backDrop.x2 -= gameSpeed - 2;
+    }
 }
 function startAnimating(fps) {
     fpsInterval = 1000 / fps;
@@ -32,7 +41,8 @@ function animate() {
     if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        handleBackground();
+        ctx.drawImage(background, backDrop.x1 - 2, backDrop.y, backDrop.width, backDrop.height);
+        ctx.drawImage(background, backDrop.x2, backDrop.y, backDrop.width, backDrop.height);
         sprite.draw();
         if (pressedEnter === false) {
             ctx.font = "40px Georgia";
@@ -44,6 +54,7 @@ function animate() {
             ctx.stroke();
         }
         else {
+            handleBackground();
             sprite.update();
         }
     }
@@ -62,4 +73,4 @@ window.addEventListener("keyup", function (e) {
     }
     sprite.moving = false;
 });
-startAnimating(20);
+startAnimating(25);

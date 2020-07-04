@@ -31,7 +31,7 @@ class Sprite implements CharacterInterface {
   moving: boolean;
   jumping: boolean;
   constructor() {
-    this.x = 100;
+    this.x = 400;
     this.y = canvas.height;
     this.vel_x = 0;
     this.vel_y = 0;
@@ -64,7 +64,9 @@ class Sprite implements CharacterInterface {
   }
   move() {
     if (keys["ArrowRight"]) {
-      this.vel_x += 3;
+      if (this.x < 400) {
+        this.vel_x += 2;
+      }
       this.frameY = 2;
       this.moving = true;
     }
